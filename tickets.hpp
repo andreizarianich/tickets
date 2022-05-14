@@ -35,6 +35,20 @@ class Tickets
     //deallocates memory if needed
     ~Tickets();
 
+    // //AddEvent saves event to text file, and then just open it like halls.txt - if you can't - the event doesn't exist
+    void NewAct();
+
+    void PrintFreeSeats();
+
+    // void ReserveTicket();
+
+    // void CancelReservation();
+
+    void BuyTicket();
+
+    int getRows(const int& hall);
+    int getSeats(const int& hall);
+
     public:
     
     //level 1

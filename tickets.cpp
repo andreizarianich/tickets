@@ -1,6 +1,7 @@
 #include "tickets.hpp"
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 void Tickets::ReadHalls()
 {
@@ -37,8 +38,6 @@ void Tickets::ReadHalls()
 
             hall_list >> temp_int; //reading third number for seats
             this->halls[hall_counter][1] = temp_int;
-
-            std::cout<< this->halls[hall_counter][0] << " - " << this->halls[hall_counter][1] << std::endl;
             hall_counter++;
         }
     }
@@ -60,25 +59,177 @@ Tickets::~Tickets()
 void Tickets::StartInternal()
 {
     Tickets::getInstance().ReadHalls();
-
-    do
-    {
-        Tickets::getInstance().PrintMenu();
-    } while (Tickets::getInstance().CheckInput()!='0');
-
+    Tickets::getInstance().PrintMenu();
 }
 
 char Tickets::CheckInput()
 {
     char user_input;
-    std::cout<< "Please choose an option: \n";
-    std::cin.get(user_input);
+    std::cout<< "Please choose an option: "<<std::endl;
+    std::cin.get(user_input); //if entered more than the char can handle - program starts going crazy
+    std::cin.ignore();
     return user_input;
 }
 
 void Tickets::PrintMenu()
 {
-    std::cout<< "--------- Welcome ---------\n1: Buy a ticket\n2: Reserve a ticket\n3: Check for free seats";
-    std::cout<< "\n4: Cancel reservation\n5: See list of reservations\n6: See list of sold tickets\n7: Add a new event";
+    std::cout<< "--------- Welcome ---------\n1: Buy a ticket\n2: Check for free seats";
+    std::cout<< "\n3: Add a new event";
     std::cout<< "\n0: Exit\n---------------------------\n";
+    switch (Tickets::getInstance().CheckInput())
+    {
+    case '1':
+        Tickets::getInstance().BuyTicket();
+        break;
+    case '2':
+        Tickets::getInstance().PrintFreeSeats();
+        break;
+    case '3':
+        Tickets::getInstance().NewAct();
+        break;
+    case '0':
+        break;        
+    default:
+        Tickets::getInstance().PrintMenu();
+        break;
+    }
 }
+
+void Tickets::NewAct()
+{
+    char name[100], date[100], file_name[206];
+    int hall;
+    std::cout<<"Name: ";
+    std::cin.getline(name, 100);
+    std::cout<<"Date (dd.mm.yyyy): ";
+    std::cin.getline(date, 100);
+    std::cout<<"Hall#: ";
+    std::cin>> hall;
+
+    strcpy(file_name, name);
+    strcat(file_name, "-");
+    strcat(file_name, date);
+    strcat(file_name, ".txt");
+
+    //date has to be specifically in day.month.year format! day/month/year breaks the file name (because of '/')
+
+    std::ofstream file(file_name);
+    if(file.is_open())
+    {
+        if (hall <= this->number_of_halls+1)
+        {
+            file<<hall<<"\n";
+            for (int i = 0; i < this->getRows(hall-1); i++)
+            {
+                for (int j = 0; j < this->getSeats(hall-1); j++)
+                {
+                    file<<"0";
+                }
+                file<<"\n";
+                
+            }
+        }
+    }    
+    else
+        std::cout<<"Error! Most likely because \"/\" was entered.\n";
+    file.close();    
+    std::cin.ignore();
+    Tickets::getInstance().PrintMenu();
+}
+
+int Tickets::getRows(const int& hall)
+{
+    return this->halls[hall][0];
+}
+
+int Tickets::getSeats(const int& hall)
+{
+    return this->halls[hall][1];
+}
+
+void Tickets::BuyTicket()
+{
+    char name[100], date[100], file_name[206];
+    int hall, row, seat;
+
+    std::cout<<"Act name: ";
+    std::cin.getline(name, 100);
+
+    std::cout<<"Date (dd.mm.yyy.): ";
+    std::cin.getline(date, 100);
+
+    std::cout<<"Row: ";
+    std::cin>>row;
+
+    std::cout<<"Seat: ";
+    std::cin>>seat;
+
+    std::cout<< "Thank you for your purchase!\n";
+
+    strcpy(file_name, name);
+    strcat(file_name, "-");
+    strcat(file_name, date);
+    strcat(file_name, ".txt");
+
+    std::ifstream file(file_name);
+    if(file.is_open())
+    {
+        file>>hall;   
+    }    
+    else
+        std::cout<<"Act not found!\n";
+    file.close();    
+
+    std::ofstream file_p(file_name);
+    if(file_p.is_open())
+    {
+        file_p.seekp(1+row*this->getSeats(hall-1)-seat, std::ios::beg);
+        file_p<< '1';
+    }    
+    else
+        std::cout<<"Act not found!\n";
+    file_p.close(); 
+    std::cin.ignore();
+    Tickets::getInstance().PrintMenu();       
+}
+
+void Tickets::PrintFreeSeats()
+{
+    char name[100], date[100], file_name[206], temp;
+    int hall;
+
+    std::cout<<"Act name: ";
+    std::cin.getline(name, 100);
+
+    std::cout<<"Date (dd.mm.yyy.): ";
+    std::cin.getline(date, 100);
+
+    strcpy(file_name, name);
+    strcat(file_name, "-");
+    strcat(file_name, date);
+    strcat(file_name, ".txt");
+
+    std::ifstream file(file_name);
+    if(file.is_open())
+    {
+        file>>hall;
+        for (int i = 0; i < this->getRows(hall-1); i++)
+        {
+            std::cout<<i+1<<": ";
+            for (int j = 0; i < this->getSeats(hall-1); i++)
+            {
+                file.get(temp);
+                if (temp == '0')
+                    std::cout <<temp<<" ";
+            }
+            std::cout<<std::endl;
+        }
+
+    }    
+    else
+        std::cout<<"Act not found!\n";
+    file.close();  
+    std::cin.ignore();
+    Tickets::getInstance().PrintMenu();   
+}
+
