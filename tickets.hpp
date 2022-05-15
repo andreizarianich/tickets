@@ -5,8 +5,6 @@ class Tickets
 {
     private:
 
-    //level 0
-
     //array of integers to hold values from halls.txt
     int** halls;
 
@@ -23,8 +21,6 @@ class Tickets
         this->delete_hall_list = false;
     }
 
-    void StartInternal();
-
     //reads halls.txt
     void ReadHalls();
     
@@ -40,19 +36,14 @@ class Tickets
 
     void PrintFreeSeats();
 
-    // void ReserveTicket();
-
-    // void CancelReservation();
-
     void BuyTicket();
 
     int getRows(const int& hall);
     int getSeats(const int& hall);
 
     public:
-    
-    //level 1
 
+    //code snippet taken from github (triffon/oop-2021-22/practicum/4/Week09-StaticAndTemplates/snippets/03-singleton.cpp)
     //restricting copy
     Tickets (const Tickets&) = delete;
 
@@ -67,9 +58,9 @@ class Tickets
 
         return object;
     }
-
-    //this is made to replace Tickets::getInstance().Start() with Tickets::Start()
-    static void Start() { return getInstance().StartInternal(); };
+    //end of code snippet
+    
+    void Start();
 
 };
 

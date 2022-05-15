@@ -56,7 +56,7 @@ Tickets::~Tickets()
     }
 }
 
-void Tickets::StartInternal()
+void Tickets::Start()
 {
     Tickets::getInstance().ReadHalls();
     Tickets::getInstance().PrintMenu();
@@ -66,7 +66,7 @@ char Tickets::CheckInput()
 {
     char user_input;
     std::cout<< "Please choose an option: "<<std::endl;
-    std::cin.get(user_input); //if entered more than the char can handle - program starts going crazy
+    std::cin.get(user_input); //if entered more than one char - prints menu for every next char (which is a bug)
     std::cin.ignore();
     return user_input;
 }
@@ -132,7 +132,8 @@ void Tickets::NewAct()
     }    
     else
         std::cout<<"Error! Most likely because \"/\" was entered.\n";
-    file.close();    
+    file.close();
+    std::cout<< "Done!"<<std::endl;
     std::cin.ignore();
     Tickets::getInstance().PrintMenu();
 }
@@ -172,9 +173,20 @@ void Tickets::BuyTicket()
     strcat(file_name, ".txt");
 
     std::ifstream file(file_name);
+    char** act;
     if(file.is_open())
     {
-        file>>hall;   
+        file>>hall;
+        act = new char*[this->getRows(hall-1)+1];
+        for (int i = 0; i < this->getRows(hall-1); i++)
+        {
+            act[i] = new char[this->getSeats(hall-1)+1];
+            for (int j = 0; j < this->getSeats(hall-1); j++)
+            {
+                file.get(act[i][j]);
+            }
+        }
+        act[row-1][seat-1] = '1';  
     }    
     else
         std::cout<<"Act not found!\n";
@@ -183,11 +195,22 @@ void Tickets::BuyTicket()
     std::ofstream file_p(file_name);
     if(file_p.is_open())
     {
-        file_p.seekp(1+row*this->getSeats(hall-1)-seat, std::ios::beg);
-        file_p<< '1';
+        file_p<<hall;
+        for (int i = 0; i < this->getRows(hall-1); i++)
+        {
+            for (int j = 0; j < this->getSeats(hall-1); j++)
+            {
+                file_p<<act[i][j];
+            }
+        }
     }    
     else
         std::cout<<"Act not found!\n";
+    for (int i = 0; i < this->getRows(hall-1); i++)
+    {
+        delete[] act[i];
+    }   
+    delete[] act;  
     file_p.close(); 
     std::cin.ignore();
     Tickets::getInstance().PrintMenu();       
@@ -232,4 +255,3 @@ void Tickets::PrintFreeSeats()
     std::cin.ignore();
     Tickets::getInstance().PrintMenu();   
 }
-
