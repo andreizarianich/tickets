@@ -2,6 +2,6 @@
 
 int main()
 {
-    Tickets::Start();
+    Tickets::getInstance().Start();
     return 0;
 }
