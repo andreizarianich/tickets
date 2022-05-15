@@ -31,7 +31,7 @@ class Tickets
     //deallocates memory if needed
     ~Tickets();
 
-    // //AddEvent saves event to text file, and then just open it like halls.txt - if you can't - the event doesn't exist
+    //AddEvent saves event to text file, and then just open it like halls.txt - if you can't - the event doesn't exist
     void NewAct();
 
     void PrintFreeSeats();

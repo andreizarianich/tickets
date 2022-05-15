@@ -239,19 +239,18 @@ void Tickets::PrintFreeSeats()
         for (int i = 0; i < this->getRows(hall-1); i++)
         {
             std::cout<<i+1<<": ";
-            for (int j = 0; i < this->getSeats(hall-1); i++)
+            for (int j = 0; j < this->getSeats(hall-1); j++)
             {
                 file.get(temp);
                 if (temp == '0')
-                    std::cout <<temp<<" ";
+                    std::cout <<j+1<<" ";
             }
             std::cout<<std::endl;
         }
-
     }    
     else
         std::cout<<"Act not found!\n";
     file.close();  
-    std::cin.ignore();
+    //std::cin.ignore();
     Tickets::getInstance().PrintMenu();   
 }
